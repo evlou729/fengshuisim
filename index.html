@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feng Shui Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Feng Shui Simulator</h1>
+        <p class="subtitle">Arrange furniture to harmonize your bedroom's chi &nbsp;<button id="btn-rules">?  Rules</button></p>
+    </header>
+
+    <main>
+        <aside id="sidebar">
+            <h2>Furniture</h2>
+            <div id="furniture-list"></div>
+            <div class="sidebar-controls">
+                <button id="btn-rotate" title="Rotate (R)">Rotate (R)</button>
+                <button id="btn-remove" title="Remove (Del)">Remove (Del)</button>
+                <button id="btn-deselect" title="Deselect (Esc)">Deselect</button>
+            </div>
+            <div class="shortcuts-info">
+                <p><kbd>R</kbd> Rotate &bull; <kbd>Del</kbd> Remove &bull; <kbd>Esc</kbd> Cancel</p>
+                <p>Drag from sidebar to place</p>
+            </div>
+        </aside>
+
+        <section id="canvas-area">
+            <canvas id="game-canvas" width="560" height="432"></canvas>
+            <div id="canvas-bar">
+                <div id="selection-info"></div>
+                <button id="btn-clear">Clear All</button>
+            </div>
+            <div id="bagua-legend">
+                <h3>Bagua Zones</h3>
+                <div class="legend-grid">
+                    <span class="legend-item" data-zone="wealth"><span class="legend-color"></span>Wealth</span>
+                    <span class="legend-item" data-zone="fame"><span class="legend-color"></span>Fame</span>
+                    <span class="legend-item" data-zone="love"><span class="legend-color"></span>Love</span>
+                    <span class="legend-item" data-zone="family"><span class="legend-color"></span>Family</span>
+                    <span class="legend-item" data-zone="health"><span class="legend-color"></span>Health</span>
+                    <span class="legend-item" data-zone="children"><span class="legend-color"></span>Children</span>
+                    <span class="legend-item" data-zone="knowledge"><span class="legend-color"></span>Knowledge</span>
+                    <span class="legend-item" data-zone="career"><span class="legend-color"></span>Career</span>
+                    <span class="legend-item" data-zone="travel"><span class="legend-color"></span>Travel</span>
+                </div>
+            </div>
+        </section>
+
+        <aside id="score-panel">
+            <h2>Feng Shui Score</h2>
+            <div id="score-display">
+                <div id="total-score">
+                    <span id="score-value">--</span>
+                    <span id="score-max">/ 100</span>
+                </div>
+                <div id="score-tier">Place furniture and check!</div>
+            </div>
+            <button id="btn-check">Check Feng Shui</button>
+            <div id="score-breakdown"></div>
+            <div id="tips-section">
+                <h3>Tips</h3>
+                <ul id="tips-list"></ul>
+            </div>
+        </aside>
+    </main>
+
+    <footer></footer>
+
+    <div id="rules-overlay">
+        <div id="rules-popup">
+            <h2>Welcome to Feng Shui Simulator</h2>
+
+            <div class="rules-section">
+                <h3>What is Feng Shui?</h3>
+                <p>Feng Shui is the ancient Chinese art of arranging space to harmonize energy flow (<em>chi</em>). A well-arranged bedroom promotes restful sleep, good fortune, and balanced life energy.</p>
+            </div>
+
+            <div class="rules-columns">
+                <div class="rules-section">
+                    <h3>Key Principles</h3>
+                    <ul>
+                        <li><strong>Command Position</strong> &mdash; Place your bed where you can see the door but aren't directly in line with it. Never sleep with feet pointing at the door ("coffin position").</li>
+                        <li><strong>Chi Flow</strong> &mdash; Keep a clear path from the door to the bed. Don't block doorways. Energy needs room to circulate.</li>
+                        <li><strong>Bagua Zones</strong> &mdash; The room maps to a 3x3 grid of life areas (wealth, love, career, etc.). Place matching elements in each zone for harmony.</li>
+                        <li><strong>Five Elements</strong> &mdash; Wood, Fire, Earth, Metal, Water. Balance all five, and place elements that nurture each other nearby.</li>
+                        <li><strong>Symmetry</strong> &mdash; Matching nightstands and lamps on both sides of the bed create partnership energy.</li>
+                        <li><strong>Mirrors</strong> &mdash; Never face a mirror toward the bed. Reflecting the window is good; facing the door is not.</li>
+                    </ul>
+                </div>
+
+                <div class="rules-section">
+                    <h3>How to Play</h3>
+                    <ul>
+                        <li><strong>Drag</strong> furniture from the sidebar onto the room grid.</li>
+                        <li>Press <kbd>R</kbd> while dragging to <strong>rotate</strong> before placing.</li>
+                        <li><strong>Click</strong> a placed item to select it, then <kbd>R</kbd> to rotate or <kbd>Del</kbd> to remove.</li>
+                        <li><strong>Drag</strong> placed items to reposition them.</li>
+                        <li>Press <strong>Check Feng Shui</strong> to score your arrangement across 8 categories.</li>
+                        <li>Follow the tips to improve your score toward <strong>Grand Master</strong> (90+)!</li>
+                    </ul>
+                    <h3>Scoring (100 pts)</h3>
+                    <p class="scoring-summary">
+                        Command Position (20) &bull; Chi Flow (15) &bull; Bagua Harmony (15) &bull; Element Balance (10) &bull; Bed Symmetry (10) &bull; Mirror (10) &bull; Plants (10) &bull; Clutter (10)
+                    </p>
+                </div>
+            </div>
+
+            <button id="btn-start">Begin Arranging</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
