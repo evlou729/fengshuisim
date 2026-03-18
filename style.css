@@ -264,6 +264,10 @@ main {
 }
 
 #score-value {
+    color: #b8a890;
+}
+
+#score-value.checked {
     color: #dda15e;
 }
 

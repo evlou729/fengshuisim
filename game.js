@@ -69,6 +69,7 @@ const state = {
     mousePos: null,        // { px, py } pixel pos relative to canvas
     drag: null,            // { source:'sidebar'|'placed', defIndex, w, h, rotation, placedId, originX, originY, originW, originH, originRot }
     showBagua: false,
+    showBaguaAlways: true,
     scoreResult: null,
     nextItemId: 0,
     chiPath: null,
@@ -138,6 +139,7 @@ function init() {
     buildSidebar();
     setupEvents();
     setupRulesPopup();
+    updateBaguaLegend();
     gameLoop();
 }
 
@@ -350,19 +352,29 @@ function setupEvents() {
         }
 
         if (!placed) {
-            // Return to origin if dragged from grid, or refund to inventory
+            // If mouse is outside the canvas, return item to inventory
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const outsideCanvas = mx < 0 || my < 0 || mx >= canvas.width || my >= canvas.height;
+
             if (drag.source === 'placed' && drag.originX !== null) {
-                // Place back at original position with original dimensions
-                state.placedItems.push({
-                    id: drag.placedId,
-                    defIndex: drag.defIndex,
-                    x: drag.originX,
-                    y: drag.originY,
-                    w: drag.originW,
-                    h: drag.originH,
-                    rotation: drag.originRot,
-                });
-                state.inventory[def.id]--;
+                if (outsideCanvas) {
+                    // Return to inventory (inventory was already incremented on pickup)
+                    clearScoreDisplay();
+                } else {
+                    // Snap back to original position
+                    state.placedItems.push({
+                        id: drag.placedId,
+                        defIndex: drag.defIndex,
+                        x: drag.originX,
+                        y: drag.originY,
+                        w: drag.originW,
+                        h: drag.originH,
+                        rotation: drag.originRot,
+                    });
+                    state.inventory[def.id]--;
+                }
             }
             // sidebar drags just cancel — inventory was never decremented
         }
@@ -385,6 +397,10 @@ function setupEvents() {
             }
         }
         if (e.key === 'Delete' || e.key === 'Backspace') removeSelected();
+        if (e.key === 'b' || e.key === 'B') {
+            state.showBaguaAlways = !state.showBaguaAlways;
+            updateBaguaLegend();
+        }
         if (e.key === 'Escape') {
             if (state.drag) {
                 cancelDrag();
@@ -416,6 +432,10 @@ function setupEvents() {
     });
     document.getElementById('btn-check').addEventListener('click', checkFengShui);
     document.getElementById('btn-clear').addEventListener('click', clearAllFurniture);
+    document.getElementById('btn-bagua').addEventListener('click', () => {
+        state.showBaguaAlways = !state.showBaguaAlways;
+        updateBaguaLegend();
+    });
 }
 
 function updateSelectionInfo() {
@@ -570,7 +590,14 @@ function render() {
     drawDoor();
     drawWindow();
 
+    if (state.showBaguaAlways && !state.showBagua) drawBaguaZoneTint();
     if (state.showBagua) drawBaguaOverlay();
+
+    // Clip all item rendering to the interior
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(IX, IY, GRID_W * CELL, GRID_H * CELL);
+    ctx.clip();
 
     // Draw floor overlays (rugs/runners)
     for (const item of state.placedItems) {
@@ -589,6 +616,8 @@ function render() {
         const def = FURNITURE_DEFS[item.defIndex];
         if (!isFloorOverlay(def.id)) drawPlacedItem(item);
     }
+
+    ctx.restore();
 
     // Draw selection highlight
     if (state.selectedPlaced !== null) {
@@ -764,6 +793,26 @@ function drawGlows(items) {
     ctx.restore();
 }
 
+function drawBaguaZoneTint() {
+    const zoneW = INTERIOR.w / 3;
+    const zoneH = INTERIOR.h / 3;
+    for (const zone of BAGUA_ZONES) {
+        const zx = gx2px(INTERIOR.x + zone.col * zoneW);
+        const zy = gy2py(INTERIOR.y + zone.row * zoneH);
+        const zw = zoneW * CELL;
+        const zh = zoneH * CELL;
+        ctx.fillStyle = zone.color + '18';
+        ctx.fillRect(zx, zy, zw, zh);
+        ctx.strokeStyle = zone.color + '30';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(zx + 0.5, zy + 0.5, zw - 1, zh - 1);
+        ctx.fillStyle = zone.color + '80';
+        ctx.font = '7px "Silkscreen", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(zone.name, zx + zw / 2, zy + 10);
+    }
+}
+
 function drawBaguaOverlay() {
     const zoneW = INTERIOR.w / 3;
     const zoneH = INTERIOR.h / 3;
@@ -799,8 +848,8 @@ function drawPlacedItem(item) {
     ctx.save();
     ctx.translate(px + (item.w * CELL) / 2, py + (item.h * CELL) / 2);
     ctx.rotate((item.rotation * Math.PI) / 180);
-    ctx.translate(-(item.w * CELL) / 2, -(item.h * CELL) / 2);
-    drawFurniture(ctx, def.id, 0, 0, item.w, item.h);
+    ctx.translate(-(def.w * CELL) / 2, -(def.h * CELL) / 2);
+    drawFurniture(ctx, def.id, 0, 0, def.w, def.h);
     ctx.restore();
 }
 
@@ -824,8 +873,8 @@ function drawGhostPreview() {
     const py = gy2py(gy);
     ctx.translate(px + (w * CELL) / 2, py + (h * CELL) / 2);
     ctx.rotate((drag.rotation * Math.PI) / 180);
-    ctx.translate(-(w * CELL) / 2, -(h * CELL) / 2);
-    drawFurniture(ctx, def.id, 0, 0, w, h);
+    ctx.translate(-(def.w * CELL) / 2, -(def.h * CELL) / 2);
+    drawFurniture(ctx, def.id, 0, 0, def.w, def.h);
     ctx.restore();
 }
 
@@ -1718,20 +1767,45 @@ function calculateScore() {
 }
 
 // ===== SCORE UI =====
-function checkFengShui() {
-    state.showBagua = true;
-    document.getElementById('bagua-legend').classList.add('visible');
+function calculateScoreQuiet() {
+    const savedChiPath = state.chiPath;
+    const savedHighlights = { ...state.itemHighlights };
     const result = calculateScore();
-    state.scoreResult = result;
-    displayScore(result);
+    state.chiPath = savedChiPath;
+    state.itemHighlights = savedHighlights;
+    return result;
+}
 
-    // Auto-hide bagua after 8 seconds
-    setTimeout(() => {
+function updateLiveScore() {
+    if (state.placedItems.length === 0) {
+        document.getElementById('score-value').textContent = '--';
+        document.getElementById('score-tier').textContent = 'Place furniture and check!';
+        document.getElementById('score-tier').style.color = '';
+        return;
+    }
+    const result = calculateScoreQuiet();
+    document.getElementById('score-value').textContent = result.total;
+    const tierEl = document.getElementById('score-tier');
+    tierEl.textContent = result.tier;
+    tierEl.style.color = result.total >= 75 ? '#dda15e' :
+                         result.total >= 40 ? '#bc6c25' : '#a84535';
+}
+
+function checkFengShui() {
+    // Toggle off if already showing
+    if (state.showBagua && state.scoreResult) {
         state.showBagua = false;
         state.itemHighlights = {};
         state.chiPath = null;
-        document.getElementById('bagua-legend').classList.remove('visible');
-    }, 8000);
+        updateBaguaLegend();
+        return;
+    }
+    state.showBagua = true;
+    updateBaguaLegend();
+    const result = calculateScore();
+    state.scoreResult = result;
+    displayScore(result);
+    document.getElementById('score-value').classList.add('checked');
 }
 
 function displayScore(result) {
@@ -1794,17 +1868,21 @@ function clearAllFurniture() {
     updateSelectionInfo();
 }
 
+function updateBaguaLegend() {
+    document.getElementById('bagua-legend').classList.toggle('visible',
+        state.showBaguaAlways || state.showBagua);
+}
+
 function clearScoreDisplay() {
     state.scoreResult = null;
     state.showBagua = false;
     state.chiPath = null;
     state.itemHighlights = {};
-    document.getElementById('bagua-legend').classList.remove('visible');
-    document.getElementById('score-value').textContent = '--';
-    document.getElementById('score-tier').textContent = 'Place furniture and check!';
-    document.getElementById('score-tier').style.color = '';
+    updateBaguaLegend();
+    document.getElementById('score-value').classList.remove('checked');
     document.getElementById('score-breakdown').innerHTML = '';
     document.getElementById('tips-list').innerHTML = '';
+    updateLiveScore();
 }
 
 // ===== START =====
