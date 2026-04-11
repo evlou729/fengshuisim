@@ -23,10 +23,10 @@ A browser-based 2D pixel art puzzle game where you arrange furniture in a bedroo
 
 ## Tech Stack
 
-HTML5 Canvas + vanilla JavaScript. No dependencies. Three files:
+HTML5 Canvas + vanilla JavaScript. No dependencies. Files:
 
 - `index.html`
 - `style.css`
-- `game.js`
+- `js/` — `config`, `state`, `sprites`, `render`, `placement`, `scoring`, `ui`, `input`, `main`
 
 Open `index.html` in any browser to play.
