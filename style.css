@@ -76,7 +76,7 @@ main {
     padding: 5px 6px;
     margin-bottom: 3px;
     border-radius: 0;
-    cursor: grab;
+    cursor: inherit;
     transition: background 0.15s;
     border: 1px solid transparent;
     font-size: 0.75em;
@@ -88,7 +88,7 @@ main {
 }
 
 .furniture-item:active {
-    cursor: grabbing;
+    cursor: inherit;
 }
 
 .furniture-item.selected {
@@ -98,7 +98,7 @@ main {
 
 .furniture-item.depleted {
     opacity: 0.35;
-    cursor: not-allowed;
+    cursor: inherit;
 }
 
 .furniture-item canvas {
@@ -148,7 +148,7 @@ main {
     color: #d4c4a8;
     border: none;
     border-radius: 0;
-    cursor: pointer;
+    cursor: inherit;
     transition: background 0.15s;
 }
 
@@ -184,7 +184,7 @@ main {
 #game-canvas {
     border: none;
     border-radius: 0;
-    cursor: crosshair;
+    cursor: crosshair !important;
     image-rendering: pixelated;
 }
 
@@ -214,7 +214,7 @@ main {
     border: none;
     border-radius: 0;
     padding: 5px 10px;
-    cursor: pointer;
+    cursor: inherit;
     box-shadow: 3px 3px 0 #5c3410, inset -2px -2px 0 #945520, inset 2px 2px 0 #d48a3a;
     white-space: nowrap;
 }
@@ -292,7 +292,7 @@ main {
     color: #fefae0;
     border: none;
     border-radius: 0;
-    cursor: pointer;
+    cursor: inherit;
     letter-spacing: 1px;
     margin-bottom: 10px;
     box-shadow: 4px 4px 0 #1e3210, inset -2px -2px 0 #3a6420, inset 2px 2px 0 #6a9a48;
@@ -443,7 +443,7 @@ footer {
     font-size: 0.9em;
     padding: 2px 10px;
     border-radius: 0;
-    cursor: pointer;
+    cursor: inherit;
     transition: all 0.15s;
     vertical-align: middle;
 }
@@ -591,7 +591,7 @@ footer {
     color: #fefae0;
     border: none;
     border-radius: 0;
-    cursor: pointer;
+    cursor: inherit;
     letter-spacing: 1.5px;
     box-shadow: 6px 6px 0 #5c3410, inset -2px -2px 0 #945520, inset 2px 2px 0 #d48a3a;
     image-rendering: pixelated;

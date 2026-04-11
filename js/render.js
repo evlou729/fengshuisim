@@ -1,3 +1,66 @@
+// ===== CUSTOM CURSOR =====
+function generateCursor() {
+    const P = 2; // pixel size
+    const size = 32;
+    const cc = document.createElement('canvas');
+    cc.width = size; cc.height = size;
+    const c = cc.getContext('2d');
+
+    const fill = (x, y, w, h, color) => {
+        c.fillStyle = color;
+        c.fillRect(x * P, y * P, w * P, h * P);
+    };
+
+    // Chinese coin design (centered in 32x32 canvas)
+    // Using warm gold from game palette for better contrast
+    const coinColor = '#dda15e'; // Warm gold - matches game accent color
+    const shadowColor = '#241e16'; // Dark brown for subtle drop shadow
+    const ox = 4; // offset to center 8x8 coin in 16x16 art pixel space
+    const oy = 4;
+
+    // Drop shadow (offset by 1 pixel down and right)
+    const sx = ox + 1, sy = oy + 1;
+    fill(sx + 2, sy + 0, 4, 1, shadowColor); // Shadow row 0
+    fill(sx + 1, sy + 1, 6, 1, shadowColor); // Shadow row 1
+    fill(sx + 0, sy + 2, 8, 1, shadowColor); // Shadow row 2
+    fill(sx + 0, sy + 3, 3, 1, shadowColor); // Shadow row 3: left
+    fill(sx + 5, sy + 3, 3, 1, shadowColor); // Shadow row 3: right
+    fill(sx + 0, sy + 4, 3, 1, shadowColor); // Shadow row 4: left
+    fill(sx + 5, sy + 4, 3, 1, shadowColor); // Shadow row 4: right
+    fill(sx + 0, sy + 5, 8, 1, shadowColor); // Shadow row 5
+    fill(sx + 1, sy + 6, 6, 1, shadowColor); // Shadow row 6
+    fill(sx + 2, sy + 7, 4, 1, shadowColor); // Shadow row 7
+
+    // Main coin pattern (8x8 art pixels, overlaid on shadow)
+    fill(ox + 2, oy + 0, 4, 1, coinColor); // Row 0: 4 pixels wide
+    fill(ox + 1, oy + 1, 6, 1, coinColor); // Row 1: 6 pixels wide
+    fill(ox + 0, oy + 2, 8, 1, coinColor); // Row 2: full width
+    fill(ox + 0, oy + 3, 3, 1, coinColor); // Row 3: left side
+    fill(ox + 5, oy + 3, 3, 1, coinColor); // Row 3: right side (square hole in middle)
+    fill(ox + 0, oy + 4, 3, 1, coinColor); // Row 4: left side
+    fill(ox + 5, oy + 4, 3, 1, coinColor); // Row 4: right side (square hole in middle)
+    fill(ox + 0, oy + 5, 8, 1, coinColor); // Row 5: full width
+    fill(ox + 1, oy + 6, 6, 1, coinColor); // Row 6: 6 pixels wide
+    fill(ox + 2, oy + 7, 4, 1, coinColor); // Row 7: 4 pixels wide
+
+    const url = cc.toDataURL('image/png');
+    document.body.style.cursor = `url(${url}) 16 16, auto`; // Center hotspot
+}
+
+// ===== FAVICON =====
+function generateFavicon() {
+    const size = 32;
+    const fc = document.createElement('canvas');
+    fc.width = size; fc.height = size;
+    const fctx = fc.getContext('2d');
+    fctx.scale(size / CELL, size / CELL);
+    drawFurniture(fctx, 'plant', 0, 0, 1, 1);
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.href = fc.toDataURL('image/png');
+    document.head.appendChild(link);
+}
+
 // ===== BACKGROUND PATTERN =====
 function generateBgPattern() {
     const S = 48; // cell size
